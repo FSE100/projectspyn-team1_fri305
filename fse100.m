@@ -1,93 +1,95 @@
-brick = legoev3;    
-
-left = motor(brick, 'A');
-right = motor(brick, 'B');         
-chair = motor(brick, 'D');
-ultrasonic = sonicSensor(brick);
-touch = touchSensor(brick);
-
 global key
-PERIOD = 0.1;                           
-SPEED = 0;     
-distance = 0;
-touched = false;
+PERIOD = 0.1;
 
-left.Speed = SPEED;
-right.Speed = SPEED;
-
-clearLCD(brick)
 InitKeyboard()
 
 infinite = true
 manualControl = false;
 
+brick.SetColorMode(1,2);
 while infinite
     if(key == 'e')
         manualControl = true;
-        clearLCD(brick);
-        writeLCD(brick, 'MC Enabled');
     end
     
     if(manualControl == true)
     switch key
         case 'w'
-            stop(left);
-            stop(right);
-            SPEED = 50;
-            left.Speed = SPEED;
-            right.Speed = SPEED;
-            start(left)
-            start(right)
+            brick.StopMotor('A');
+            brick.StopMotor('B');
+            brick.MoveMotor('A',50);
+            brick.MoveMotor('B',50);
         case 's'
-            stop(left);
-            stop(right);
-            SPEED = -50;
-            left.Speed = SPEED;
-            right.Speed = SPEED;
-            start(left)
-            start(right)
-        case 'l'
-            stop(left);
-            stop(right);
-            SPEED = 20;
-            left.Speed = -SPEED;
-            right.Speed = SPEED;
-            start(left)
-            start(right)
-            pause(2);
-            stop(left);
-            stop(right);
-        case 'r'
-            stop(left);
-            stop(right);
-            SPEED = 20;
-            left.Speed = SPEED;
-            right.Speed = -SPEED;
-            start(left)
-            start(right)
-            pause(2);
-            stop(left);
-            stop(right);
+            brick.StopMotor('A');
+            brick.StopMotor('B');
+            brick.MoveMotor('A',-50);
+            brick.MoveMotor('B',-50);
+        case 'a'
+            brick.StopMotor('A');
+            brick.StopMotor('B');
+            brick.MoveMotor('A',-20);
+            brick.MoveMotor('B',20);
+        case 'd'
+            brick.StopMotor('A');
+            brick.StopMotor('B');
+            brick.MoveMotor('A',20);
+            brick.MoveMotor('B',-20);
         case 'p'
             manualControl = false;
-            clearLCD(brick);
-            writeLCD(brick, 'MC not enabled!');
-        case 'z'
-            stop(left)
-            stop(right)
+        case 'shift'
+            brick.StopMotor('A');
+            brick.StopMotor('B');
+        case 'c'
+            brick.MoveMotor('D', 5);
+            pause(0.5);
+            brick.StopMotor('D');
+        case 'v'
+            brick.MoveMotor('D', -5);
+            pause(0.5);
+            brick.StopMotor('D');
         case 'q'
-            stop(left)
-            stop(right)
+            brick.StopMotor('A');
+            brick.StopMotor('B');
             infinite = false
     end
     else
-        writeLCD(brick, 'MC not enabled!');
-        touched = readTouch(touch);
-        distance = readDistance(ultrasonic);
-        disp(touched)
-        disp(distance)
+        distance = brick.UltrasonicDist(1);
+        touched = brick.TouchPressed(4);
+        color = brick.ColorCode(2);
+        display(touched)
+        display(distance)
+        display(color)
+    end
+    touched = brick.TouchPressed(4);
+    if(touched == true)
+        brick.StopMotor('A');
+        brick.StopMotor('B');
+    end
+    
+    color = brick.ColorCode(2);
+    switch color
+        case 2
+            playTone(brick, 250, 0.5, 20)
+        case 3
+            playTone(brick,500,0.5,30)
+        case 4
+            playTone(brick,750,0.5,40)
+        case 5
+            playTone(brick,1000,0.5,50)
+        case 6
+            playTone(brick, 1250, 0.5, 60)
+    end
+    
+    distance = brick.UltrasonicDist(1);
+    if(distance > 15)
+        playTone(brick, 500, 0.5, 50)
+        pause(0.25)
+        playTone(brick, 750, 0.5, 10)
+        pause(0.25)
+        playTone(brick, 500, 0.5, 50)
+        pause(0.25)
+        playTone(brick, 750, 0.5, 10)
+        pause(0.25)
     end
     pause(PERIOD);
 end
-
-clear
