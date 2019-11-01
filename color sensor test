@@ -1,0 +1,42 @@
+brick = legoev3;
+
+brick.SetColorMode(2,2);
+
+Color = birck.ColorCode(2);
+
+if color = 5
+  brick.StopMotor('A');
+  brick.StopMotor('B');
+  pause(4);
+  brick.MoveMotor('A', 50);
+  brick.MoveMotor('B', 50);
+end
+
+if color = 2
+  brick.StopMotor('A');
+  brick.StopMotor('B');
+  Brick.MoveMotor('A', 10);
+  Brick.MoveMotor('B', -10);
+  if color = 7
+    brick.StopMotor('A');
+    brick.StopMotor('B');
+    Brick.MoveMotor('A', 10);
+    Brick.MoveMotor('B', -10);
+    pause(1);
+    Brick.MoveMotor('D', -5);
+    Brick.MoveMotor('B', 10);
+    Brick.MoveMotor('A', 10);
+    pause(3);
+    Brick.MoveMotor('D', 5);
+    brick.StopMotor('A');
+    brick.StopMotor('B');
+  end
+end
+
+if color = 3
+  brick.StopMotor('A');
+  brick.StopMotor('B');
+  Brick.MoveMotor('D', -5);
+  Brick.MoveMotor('B', -10);
+  Brick.MoveMotor('A', -10);
+end
