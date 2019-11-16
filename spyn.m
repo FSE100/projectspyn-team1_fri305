@@ -20,13 +20,6 @@ brick.SetColorMode(2,2);
 
 infinite = true
 
-% States
-% 0: Normal
-% 1: Reverse from wall
-% 2: Scan for possible paths
-% 3: Color Red Scanned, Pause robot
-% 4: Color Blue Scanned, Pause robot, 
-% Manual Control Variables
 global key;
 InitKeyboard();
 manualControlEnabled = false;
@@ -37,83 +30,56 @@ foundGreen = false;
 
 % Main Loop
 while infinite
-    pause(0.1);
-    curState
-    
+    pause(0.25);
+    distance = brick.UltrasonicDist(1);
+    touchedL = brick.TouchPressed(3)
+    touchedR = brick.TouchPressed(4)
+    color = brick.ColorCode(2)
+    manualControlEnabled;
     % Enter Manual Control
     if(key == 'm')
         manualControlEnabled = true;
-        brick.StopMotor('AB');
+        brick.StopMotor('AB', 'Brake');
     end
-    
     % Autonomous Control
     if(manualControlEnabled == false)
-        switch curState
-            case 0
-                Forward32(brick);
-                bumpedRight = brick.TouchPressed(4)
-                bumpedLeft = brick.TouchPressed(3)
-                color = brick.ColorCode(2)
-%                 if(bumpedRight == 1 || bumpedLeft == 1)
-%                     brick.beep(1);
-% %                     if(color == 2)
-% %                         curState = 4;
-% %                     elseif(color == 4)
-% %                         curState = 1;
-% %                     elseif(color == 5)
-% %                         curState = 3;
-% %                     else
-%                     curState = 1;
-%                     brick.StopMotor('AB');
-%                 end
-            if(bumpedLeft == 1 || bumpedRight == 1)
-                brick.beep(1);
-                curState = 1;
-            end
-            curState = 2;
-            case 1
-                brick.MoveMotorAngleRel('AB', bwdSpeed, 585, 'Coast');
-                brick.WaitForMotor('AB');
-                curState = 2;
-            case 2
-                % Check all sides
-                distances = zeros(1,3);
-                distances(1) = brick.UltrasonicDist(1)
-                LeftTurn90(brick);
-                LeftTurn90(brick);
-                distances(2) = brick.UltrasonicDist(1)
-                LeftTurn90(brick);
-                distances(3) = brick.UltrasonicDist(1)
-                
-                % If all sides are below a threshold, pick a random one
-                if(sum(distances>75) == 0)
-                    RightTurn90(brick);
-                else
-                    r = randi(3)
-                    while(distances(r) < 75)
-                        r = randi(3)
-                    end
-                
-                    switch r
-                        case 1
-                            LeftTurn90(brick);
-                            LeftTurn90(brick);
-                            curState = 0;
-                        case    2
-                            % Do Nothing
-                        case 3
-                            LeftTurn90(brick);
-                            curState = 0;
-                    end
-                end
-            case 3
-                brick.StopMotor('AB');
-                pause(4);
-                curState = 0;
-            case 4
-                brick.StopMotor('AB');
-                manualControlEnabled = true;
-        end
+        if color == 5
+            brick.StopMotor('AB', 'Brake')
+            pause(4)
+            brick.MoveMotorAngleRel('AB', -20, 270, 'Brake');
+            brick.WaitForMotor('AB');
+        
+        elseif color == 2
+            manualControlEnabled = true;
+            brick.StopMotor('AB');
+            
+        elseif color == 3
+            brick.StopMotor('AB');
+            brick.MoveMotorAngleRel('A', 20, 346, 'Brake');
+            brick.MoveMotorAngleRel('B', -20, 346, 'Brake');
+            brick.WaitForMotor('AB');
+            brick.MoveMotorAngleRel('D', -10, 90, 'Brake');
+            
+        elseif(touchedL == 1 || touchedR == 1)
+           brick.StopMotor('AB');    
+           brick.MoveMotorAngleRel('AB', 20, 270, 'Brake');
+           brick.WaitForMotor('AB');
+           brick.MoveMotorAngleRel('A', 20, 173, 'Brake');
+           brick.MoveMotorAngleRel('B', -20, 173, 'Brake');
+           brick.WaitForMotor('AB');
+           
+        elseif distance >= 12 && distance <= 20
+            brick.MoveMotor('A', -50);
+            brick.MoveMotor('B', -40);
+  
+        elseif distance < 12
+            brick.MoveMotor('A', -40);
+            brick.MoveMotor('B', -50);
+        
+        elseif distance > 20
+            brick.MoveMotor('A', -80);
+            brick.MoveMotor('B', -40);
+        end    
     end
     
     % Manual Control
@@ -140,14 +106,10 @@ while infinite
             manualControlEnabled = false;
         case 'z'
             brick.StopMotor('AB');
-        case 'c'
-            brick.MoveMotor('D', armSpeed);
-            pause(0.25);
-            brick.StopMotor('D');
+        case 'c' %Move Up
+            brick.MoveMotorAngleRel('D', armSpeed, 60, 'Coast');
         case 'v'
-            brick.MoveMotor('D', -armSpeed);
-            pause(0.25);
-            brick.StopMotor('D');
+            brick.MoveMotorAngleRel('D', -armSpeed, 60, 'Coast');
         case 'q'
             brick.StopMotor('AB');
             infinite = false;
