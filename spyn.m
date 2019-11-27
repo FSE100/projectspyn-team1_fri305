@@ -55,7 +55,7 @@ while infinite
     if(manualControlEnabled == false)
         % If we see red:
         if color == 5
-            blueSenseCount = 0;
+            [blueSenseCount, greenSenseCount] = reset();
             brick.StopMotor('AB', 'Brake')
             pause(4)
             brick.MoveMotorAngleRel('AB', -20, 270, 'Brake');
@@ -65,17 +65,17 @@ while infinite
         % Main wall following code:
         % Sharp Left Turn:
         if distance > 30.00
-            [blueSenseCount, greenSenseCount] = reset();
+            % [blueSenseCount, greenSenseCount] = reset();
             brick.MoveMotor('A', -70);
             brick.MoveMotor('B', -40);
         % Normal Left Turn:
         elseif distance > 20.00
-            [blueSenseCount, greenSenseCount] = reset();
+            % [blueSenseCount, greenSenseCount] = reset();
             brick.MoveMotor('A', -50);
             brick.MoveMotor('B', -45);
         % Right Turn
         elseif distance < 25.00
-            [blueSenseCount, greenSenseCount] = reset();
+            % [blueSenseCount, greenSenseCount] = reset();
             brick.MoveMotor('A', -45);
             brick.MoveMotor('B', -50);
             
@@ -85,7 +85,7 @@ while infinite
         if color == 2
             greenSenseCount = 0;
             blueSenseCount = blueSenseCount + 1;
-            if blueSenseCount > 5
+            if blueSenseCount > 3
                 brick.StopMotor('AB');
                 manualControlEnabled = true;
             end
@@ -93,7 +93,7 @@ while infinite
         elseif color == 3
             blueSenseCount = 0;
             greenSenseCount = greenSenseCount + 1;
-            if greenSenseCount > 5
+            if greenSenseCount > 3
                 brick.StopMotor('AB');
                 manualControlEnabled = true;
             end
@@ -101,14 +101,14 @@ while infinite
         
         % If either of the touch sensors are activated:
         if(touchedL == 1 || touchedR == 1)
-           [blueSenseCount, greenSenseCount] = reset();
+           % [blueSenseCount, greenSenseCount] = reset();
            brick.StopMotor('AB');    
            brick.MoveMotorAngleRel('AB', 20, 270, 'Brake');
            brick.WaitForMotor('AB');
            brick.MoveMotorAngleRel('A', 20, 173, 'Brake');
            brick.MoveMotorAngleRel('B', -20, 173, 'Brake');
            brick.WaitForMotor('AB');
-           [blueSenseCount, greenSenseCount] = reset();
+           % [blueSenseCount, greenSenseCount] = reset();
            brick.MoveMotor('A', -45);
            brick.MoveMotor('B', -50);
            
