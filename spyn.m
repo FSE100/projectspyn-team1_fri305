@@ -30,8 +30,8 @@ while infinite
     
     % Read Sensor Values
     distance = brick.UltrasonicDist(1);
-    touchedL = brick.TouchPressed(3)
-    touchedR = brick.TouchPressed(4)
+    touchedL = brick.TouchPressed(3);
+    touchedR = brick.TouchPressed(4);
     color = brick.ColorCode(2);
     
     % Print variable values
@@ -48,7 +48,7 @@ while infinite
     % Exit Program
     if(key == 'q')
         brick.StopMotor('AB');
-        infinite = false;
+        iqnfinite = false;
     end
     
     % Autonomous Control
@@ -58,7 +58,7 @@ while infinite
             [blueSenseCount, greenSenseCount] = reset();
             brick.StopMotor('AB', 'Brake')
             pause(4)
-            brick.MoveMotorAngleRel('AB', -20, 270, 'Brake');
+            brick.MoveMotorAngleRel('AB', -20, 180, 'Brake');
             brick.WaitForMotor('AB');
         end
         
@@ -85,7 +85,7 @@ while infinite
         if color == 2
             greenSenseCount = 0;
             blueSenseCount = blueSenseCount + 1;
-            if blueSenseCount > 3
+            if blueSenseCount >= 3
                 brick.StopMotor('AB');
                 manualControlEnabled = true;
             end
@@ -93,10 +93,14 @@ while infinite
         elseif color == 3
             blueSenseCount = 0;
             greenSenseCount = greenSenseCount + 1;
-            if greenSenseCount > 3
+            if greenSenseCount >= 3
                 brick.StopMotor('AB');
                 manualControlEnabled = true;
             end
+            
+        else
+            [blueSenseCount, greenSenseCount] = reset();
+            
         end
         
         % If either of the touch sensors are activated:
@@ -137,6 +141,7 @@ while infinite
             brick.MoveMotor('A',turnSpeed);
             brick.MoveMotor('B',-turnSpeed);
         case 'p' % Return to autonomous control
+            [blueSenseCount, greenSenseCount] = reset();
             manualControlEnabled = false;
         case 'z' % Stop
             brick.StopMotor('AB');
