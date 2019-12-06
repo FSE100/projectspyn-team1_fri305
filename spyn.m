@@ -23,6 +23,8 @@ global key;
 InitKeyboard();
 manualControlEnabled = false;
 
+passengerPickedUp = false;
+
 % Main Loop
 while infinite
     % Pause to ensure that we don't overload the brain
@@ -32,12 +34,13 @@ while infinite
     distance = brick.UltrasonicDist(1);
     touchedL = brick.TouchPressed(3);
     touchedR = brick.TouchPressed(4);
-    color = brick.ColorCode(2);
+    color = brick.ColorCode(2);q
     
     % Print variable values
-    blueSenseCount
-    greenSenseCount
+    blueSenseCount;
+    greenSenseCount;
     manualControlEnabled;
+    passengerPickedUp
     
     % Enter Manual Control
     if(key == 'm')
@@ -48,7 +51,7 @@ while infinite
     % Exit Program
     if(key == 'q')
         brick.StopMotor('AB');
-        iqnfinite = false;
+        infinite = false;
     end
     
     % Autonomous Control
@@ -85,17 +88,42 @@ while infinite
         if color == 2
             greenSenseCount = 0;
             blueSenseCount = blueSenseCount + 1;
-            if blueSenseCount >= 3
+            if blueSenseCount > 3 && passengerPickedUp == false
                 brick.StopMotor('AB');
+                brick.beep();
+                pause(0.25);
+                brick.beep();
+                pause(0.25);
+                brick.beep();
                 manualControlEnabled = true;
             end
         % If we see green:
         elseif color == 3
             blueSenseCount = 0;
             greenSenseCount = greenSenseCount + 1;
-            if greenSenseCount >= 3
+            if greenSenseCount >= 2
                 brick.StopMotor('AB');
-                manualControlEnabled = true;
+%                 manualControlEnabled = true;
+                brick.MoveMotorAngleRel('A', 20, 350, 'Brake');
+                brick.MoveMotorAngleRel('B', -20, 350, 'Brake');
+                brick.WaitForMotor('AB');
+                brick.MoveMotorAngleRel('D', -armSpeed, 50, 'Coast');
+                brick.WaitForMotor('D');
+                brick.MoveMotorAngleRel('AB', fwdSpeed, 360, 'Coast');
+                brick.WaitForMotor('AB');
+                brick.MoveMotorAngleRel('D', armSpeed, 50, 'Coast');
+                brick.beep();
+                pause(0.25);
+                brick.beep();
+                pause(0.25);
+                brick.beep();
+                pause(0.25);
+                brick.beep();
+                pause(0.25);
+                brick.beep();
+                [blueSenseCount, greenSenseCount] = reset();
+                passengerPickedUp = false;
+                infinite = false;
             end
             
         else
@@ -152,6 +180,10 @@ while infinite
         case 'q' % Exit program
             brick.StopMotor('AB');
             infinite = false;
+        case 't' % Passenger pickup confirmation
+            passengerPickedUp = true;
+        otherwise
+            brick.StopMotor('AB');
         end
             
     end
